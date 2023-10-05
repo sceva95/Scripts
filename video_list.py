@@ -4,16 +4,15 @@ from openpyxl import Workbook
 from tqdm import tqdm  # Importa tqdm per la barra di avanzamento
 import gc  # Importa il modulo gc per la gestione della memoria
 
+"""
+Create a xlxs file with all video file inside the directory_path and his subfolder,
+sorted by syze
 
+Before run ensure dependency are installed
 
+pip install openpyxl moviepy imageio tqdm
 
-
-
-
-
-
-
-
+"""
 
 def convert_size(size_bytes):
     for unit in ['B', 'KB', 'MB', 'GB']:
@@ -24,13 +23,15 @@ def convert_size(size_bytes):
 def get_video_info(file_path):
     try:
         video = VideoFileClip(file_path)
-        return {
+        result = {
             "size": convert_size(os.path.getsize(file_path)),
             "sizeByte": os.path.getsize(file_path),
             "name": os.path.basename(file_path),
             "resolution": video.size[0] if video.size else None,
             "errore": None  # Inizialmente nessun errore
         }
+        video.close()
+        return result
     except Exception as e:
         print(f"Errore nel leggere il file {file_path}: {e}")
         return {
