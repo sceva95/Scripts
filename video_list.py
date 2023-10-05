@@ -2,10 +2,15 @@ import os
 from moviepy.editor import VideoFileClip
 from openpyxl import Workbook
 
-    """
-    Create a xlxs file with all video file inside the directory_path and his subfolder,
-    sorted by syze
-    """
+"""
+Create a xlxs file with all video file inside the directory_path and his subfolder,
+sorted by syze
+
+Before run ensure dependency are installed
+
+pip install openpyxl moviepy imageio
+
+"""
 
 def convert_size(size_bytes):
     for unit in ['B', 'KB', 'MB', 'GB']:
@@ -26,17 +31,33 @@ def get_video_info(file_path):
         print(f"Error reading file {file_path}: {e}")
         return None
 
-def explore_directory(directory):
+def explore_directory(directory, batch_size=500):
     video_info_list = []
+    total_files = 0
+    processed_files = 0
+
+    print("Collecting data...")
     for root, dirs, files in os.walk(directory):
-        print('folder: '+ root)
         for file in files:
             file_path = os.path.join(root, file)
-            print('file' + file_path)
-            if file_path.lower().endswith(('.mp4', '.avi', '.mkv', '.mov', '.m4v')):
+            if file_path.lower().endswith(('.mp4', '.avi', '.mkv', '.mov')):
+                total_files += 1
+
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path.lower().endswith(('.mp4', '.avi', '.mkv', '.mov')):
+                print(f"Analizzando il file: {file_path} - {processed_files + 1}/{total_files} ({(processed_files + 1) / total_files * 100:.2f}%)")
                 video_info = get_video_info(file_path)
                 if video_info:
                     video_info_list.append(video_info)
+                    processed_files += 1
+
+                    # Libera la memoria ogni 500 file
+                    if processed_files % batch_size == 0:
+                        print("Liberando la memoria...")
+                        gc.collect()
+
     return video_info_list
 
 def create_excel(video_info_list, excel_path):
