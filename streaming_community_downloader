@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#this script is used to download a file from streaming_community or any other streaming provider that gives a .m3u file
+
+output_file_name=""
+
+#the one with /playlist/, it is correct if dowload a .m3u
+
+url_m3u8=""
+
+ffmpeg -i "${url_m3u8}" -c copy "${output_file_name}".mp4
